@@ -10,6 +10,7 @@ import {
 } from '../store/books/bookSlice'
 import { searchBooks } from '../helpers/api'
 import type { RootState } from '../store'
+import { useBookstoreHandlers } from '../hooks/useHandlers'
 
 const SearchContainer = styled.div`
   max-width: 1200px;
@@ -144,7 +145,13 @@ export const Search: React.FC = () => {
   const handleRetry = () => {
     handleSearch(searchQuery, currentPage)
   }
-
+  const {
+    handleBookClick,
+    handleAddToCart,
+    handleAddToBookmarks,
+    isBookInBookmarks,
+    isBookInCart
+  } = useBookstoreHandlers()
   return (
     <SearchContainer>
 
@@ -180,11 +187,11 @@ export const Search: React.FC = () => {
               <BookCard
                 key={book.isbn13}
                 book={book}
-                onBookClick={(isbn13) => console.log('Book clicked:', isbn13)}
-                onAddToCart={(book) => console.log('Add to cart:', book)}
-                onAddToBookmarks={(book) => console.log('Add to bookmarks:', book)}
-                isInCart={false}
-                isInBookmarks={false}
+                onBookClick={handleBookClick}
+                onAddToCart={handleAddToCart}
+                onAddToBookmarks={handleAddToBookmarks}
+                isInCart={isBookInCart(book)}
+                isInBookmarks={isBookInBookmarks(book)}
               />
             ))}
           </BooksGrid>

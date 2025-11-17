@@ -1,13 +1,6 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { 
-  removeFromCart, 
-  updateCartItemQuantity, 
-  clearCart 
-} from '../store/cart/cartSlice'
-import type { RootState } from '../store'
+import { useCartHandlers } from '../hooks/useCartHandlers'
 
 const CartContainer = styled.div`
   max-width: 1200px;
@@ -64,6 +57,9 @@ const BookCover = styled.img`
   object-fit: cover;
   border-radius: ${props => props.theme.borderRadius.md};
   flex-shrink: 0;
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 const BookInfo = styled.div`
@@ -244,39 +240,24 @@ const EmptyText = styled.p`
 `
 
 export const Cart: React.FC = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  
-  const { items, total, vat, totalWithVat } = useSelector((state: RootState) => state.cart)
 
-  const handleQuantityChange = (bookId: string, newQuantity: number) => {
-    if (newQuantity < 1) return
-    dispatch(updateCartItemQuantity({ isbn13: bookId, quantity: newQuantity }));
-  }
-
-  const handleRemoveItem = (bookId: string) => {
-    dispatch(removeFromCart(bookId))
-  }
-
-  const handleClearCart = () => {
-    dispatch(clearCart())
-  }
-
-  const handleContinueShopping = () => {
-    navigate('/')
-  }
-
-  const handleCheckout = () => {
-    // Здесь можно добавить логику оформления заказа
-    console.log('Proceed to checkout')
-  }
-
-  const calculateItemTotal = (price: string, quantity: number): string => {
-    const priceNum = parseFloat(price.replace('$', '')) || 0
-    return `$${(priceNum * quantity).toFixed(2)}
-    `
-  }
-  if (items.length === 0) {
+   const {
+    // Обработчики
+    handleQuantityChange,
+    handleRemoveItem,
+    handleClearCart,
+    handleContinueShopping,
+    handleCheckout,
+    handleViewDetails,
+    
+    // Данные
+    cartItems: items,
+    cartTotal: total,
+    cartVat: vat,
+    cartTotalWithVat: totalWithVat,
+    isCartEmpty
+  } = useCartHandlers()
+  if (isCartEmpty) {
     return (
       <CartContainer>
         <CartHeader>
@@ -310,6 +291,7 @@ export const Cart: React.FC = () => {
                 <BookCover
                   src={item.book.image}
                   alt={item.book.title}
+                  onClick={() => handleViewDetails(item.book.isbn13)}
                 />
                 <BookInfo>
                   <BookTitle>{item.book.title}</BookTitle>

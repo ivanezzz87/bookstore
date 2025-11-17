@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from '../store'
 import { fetchBookDetailsStart } from '../store/books/bookSlice'
-import { addToCart } from '../store/cart/cartSlice'
-import { addToBookmarks, removeFromBookmarks } from '../store/user/userSlice'
+import { useBookstoreHandlers } from '../hooks/useHandlers'
 
 const Container = styled.div`
   max-width: 800px;
@@ -122,41 +121,24 @@ type TabType = 'description' | 'authors' | 'reviews'
 export const BookDetails: React.FC = () => {
   const { isbn13 } = useParams<{ isbn13: string }>()
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const { currentBook, loading, error } = useSelector((state: RootState) => state.books)
-  const { bookmarks } = useSelector((state: RootState) => state.user)
-  const { items: cartItems } = useSelector((state: RootState) => state.cart)
   
   const [activeTab, setActiveTab] = useState<TabType>('description')
-
-  const isInBookmarks = bookmarks.some(book => book.isbn13 === currentBook?.isbn13)
-  const isInCart = cartItems.some(item => item.book.isbn13 === currentBook?.isbn13)
+  
+  // Используем хук обработчиков
+  const {
+    handleAddToCart,
+    handleAddToBookmarks,
+    handleBack,
+    isBookInBookmarks,
+    isBookInCart
+  } = useBookstoreHandlers()
 
   useEffect(() => {
     if (isbn13) {
       dispatch(fetchBookDetailsStart(isbn13))
     }
   }, [dispatch, isbn13])
-
-  const handleAddToBookmarks = () => {
-    if (currentBook) {
-      if (isInBookmarks) {
-        dispatch(removeFromBookmarks(currentBook.isbn13))
-      } else {
-        dispatch(addToBookmarks(currentBook))
-      }
-    }
-  }
-
-  const handleAddToCart = () => {
-    if (currentBook) {
-      dispatch(addToCart(currentBook))
-    }
-  }
-
-  const handleBack = () => {
-    navigate(-1)
-  }
 
   if (loading) return <Loading>Loading...</Loading>
   if (error) return <Error>Error: {error}</Error>
@@ -184,14 +166,18 @@ export const BookDetails: React.FC = () => {
             <p><strong>Rating:</strong> ⭐ {currentBook.rating}/5</p>
           </div>
 
-
-          
           <Actions>
-            <Button $primary onClick={handleAddToCart}>
-              {isInCart ? 'In Cart' : 'Add to Cart'}
+            {/* Передаем currentBook в обработчики */}
+            <Button 
+              $primary 
+              onClick={() => handleAddToCart(currentBook)}
+            >
+              {isBookInCart(currentBook) ? 'In Cart' : 'Add to Cart'}
             </Button>
-            <Button onClick={handleAddToBookmarks}>
-              {isInBookmarks ? 'Bookmarked' : 'Bookmark'}
+            <Button 
+              onClick={() => handleAddToBookmarks(currentBook)}
+            >
+              {isBookInBookmarks(currentBook) ? 'Bookmarked' : 'Bookmark'}
             </Button>
           </Actions>
         </BookInfo>

@@ -1,9 +1,8 @@
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import type { RootState } from '../store'
-import { removeFromBookmarks } from '../store/user/userSlice'
+import { useBookstoreHandlers } from '../hooks/useHandlers'
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -141,27 +140,18 @@ const EmptyText = styled.p`
 const ContinueButton = styled(Button)`
   max-width: 240px;
   background: ${props => props.theme.colors.primary};
-  color: white;
+  color: rgb(255, 255, 255);
   margin: 0 auto;
 `
 
 export const Favorites: React.FC = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const {
+    handleContinue,
+    handleBookClick,
+    handleRemoveFromBookmarks ,
+  } = useBookstoreHandlers()
 
   const favorites = useSelector((state: RootState) => state.user.bookmarks)
-
-  const handleRemove = (isbn13: string) => {
-    dispatch(removeFromBookmarks(isbn13))
-  }
-
-  const handleViewDetails = (isbn13: string) => {
-    navigate(`/books/${isbn13}`)
-  }
-
-  const handleContinue = () => {
-    navigate('/')
-  }
 
   if (favorites.length === 0) {
     return (
@@ -196,7 +186,7 @@ export const Favorites: React.FC = () => {
             <Cover 
               src={book.image} 
               alt={book.title}
-              onClick={() => handleViewDetails(book.isbn13)}
+              onClick={() => handleBookClick(book.isbn13)}
             />
             <CardInfo>
               <BookTitle>{book.title}</BookTitle>
@@ -204,7 +194,7 @@ export const Favorites: React.FC = () => {
               <BookPrice>{book.price}</BookPrice>
             </CardInfo>
             <CardActions>
-              <RemoveButton onClick={() => handleRemove(book.isbn13)}>
+              <RemoveButton onClick={() => handleRemoveFromBookmarks(book)}>
                 X
               </RemoveButton>
             </CardActions>
