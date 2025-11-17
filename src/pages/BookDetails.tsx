@@ -1,204 +1,133 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from '../store'
 import { fetchBookDetailsStart } from '../store/books/bookSlice'
 import { addToCart } from '../store/cart/cartSlice'
 import { addToBookmarks, removeFromBookmarks } from '../store/user/userSlice'
-import BookmarkActiveIcon from '../assets/BookmarkActive.svg'
-import BookmarkIcon from '../assets/BookmarkDefault.svg'
+
 const Container = styled.div`
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: ${props => props.theme.spacing.xl};
+  padding: 20px;
 `
 
-const DetailsGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: ${props => props.theme.spacing.xl};
-  
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: ${props => props.theme.spacing.lg};
+const BackButton = styled.button`
+  background: none;
+  border: none;
+  color: #2D3748;
+  cursor: pointer;
+  padding: 10px 0;
+  margin-bottom: 20px;
+  font-size: 16px;
+
+  &:hover {
+    color: #4A5568;
   }
 `
 
-const ImageSection = styled.div`
+const Content = styled.div`
   display: flex;
-  justify-content: center;
-  position: relative;
-  background-color: ${props => props.theme.colors.bgrey};
+  gap: 30px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`
+
+const BookCover = styled.div`
+  flex-shrink: 0;
+  width: 250px;
 `
 
 const BookImage = styled.img`
-  object-fit: cover;
   width: 100%;
-  border-radius: ${props => props.theme.borderRadius.lg};
+  height: 350px;
+  object-fit: cover;
+  border-radius: 8px;
 `
-const Overlay = styled.div`
-  position: absolute;
-  top: ${props => props.theme.spacing.sm};
-  right: ${props => props.theme.spacing.sm};
-  transition: opacity 0.3s ease;
 
-`
-const BookmarkButton = styled.button<{ $active: boolean }>`
-  background: rgba(30, 30, 30, 0.9);
-  border: none;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: ${props => 
-    props.$active 
-      ? props.theme.colors.secondary 
-      : props.theme.colors.text.secondary
-  };
-  font-size: 16px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: ${props => props.theme.colors.primary};
-    color: white;
-  }
-`
-const InfoSection = styled.div`
-  color: ${props => props.theme.colors.text.primary};
+const BookInfo = styled.div`
+  flex: 1;
 `
 
 const Title = styled.h1`
-  font-size: ${props => props.theme.typography.h1};
+  font-size: 24px;
   font-weight: 700;
-  margin-bottom: ${props => props.theme.spacing.md};
-  line-height: 1.3;
-`
-
-const Subtitle = styled.h2`
-  font-size: ${props => props.theme.typography.h2};
-  color: ${props => props.theme.colors.text.secondary};
-  margin-bottom: ${props => props.theme.spacing.xl};
-  font-weight: 400;
-  line-height: 1.4;
-`
-
-const MetaGrid = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${props => props.theme.spacing.md};
-  margin-bottom: ${props => props.theme.spacing.xl};
-`
-
-const MetaItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.sm};
-  padding: ${props => props.theme.spacing.sm};
-  background: ${props => props.theme.colors.bwhite};
-  border-radius: ${props => props.theme.borderRadius.md};
-`
-
-const MetaLabel = styled.span`
-  font-weight: 600;
-  color: ${props => props.theme.colors.primary};
-  min-width: 100px;
-`
-
-const PriceSection = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: ${props => props.theme.spacing.lg};
-  background: ${props => props.theme.colors.bwhite};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  margin-bottom: ${props => props.theme.spacing.xl};
+  margin-bottom: 10px;
 `
 
 const Price = styled.div`
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
-  color: ${props => props.theme.colors.secondary};
-  margin-bottom: ${props => props.theme.spacing.lg};
+  color: ${props => props.theme.colors.primary};
+  margin: 20px 0;
 `
 
 const Actions = styled.div`
   display: flex;
-  gap: ${props => props.theme.spacing.md};
+  gap: 15px;
+  margin-bottom: 30px;
 `
 
-const ActionButton = styled.button<{ $variant: 'bookmark' | 'cart'; $active: boolean }>`
-  background: ${props => {
-    if (props.$active) return props.theme.colors.secondary
-    return props.$variant === 'bookmark' 
-      ? 'transparent' 
-      : props.theme.colors.primary
-  }};
-  border: ${props => 
-    props.$variant === 'bookmark' && !props.$active
-      ? `1px solid ${props.theme.colors.primary}`
-      : 'none'
-  };
-  color: ${props => 
-    props.$active ? 'white' : props.theme.colors.primary
-  };
-  padding: ${props => props.theme.spacing.md} ${props => props.theme.spacing.xl};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  font-weight: 600;
+const Button = styled.button<{ $primary?: boolean }>`
+  padding: 12px 24px;
+  border: ${props => props.$primary ? 'none' : '1px solid #2D3748'};
+  background: ${props => props.$primary ? '#2D3748' : 'transparent'};
+  color: ${props => props.$primary ? 'white' : '#2D3748'};
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: ${props => 
-      props.$variant === 'bookmark' 
-        ? props.theme.colors.primary
-        : props.theme.colors.secondary
-  }};
-  color: white;
+  font-weight: 600;
 `
 
-const Description = styled.div`
-  background: ${props => props.theme.colors.bwhite};
-  padding: ${props => props.theme.spacing.xl};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  border: 1px solid ${props => props.theme.colors.borderDefault};
-  
-  h3 {
-    margin-bottom: ${props => props.theme.spacing.lg};
-  }
-  
-  p {
-    line-height: 1.6;
-    color: ${props => props.theme.colors.text.secondary};
-  }
+const Tabs = styled.div`
+  margin-top: 30px;
+`
+
+const TabHeaders = styled.div`
+  display: flex;
+  border-bottom: 1px solid #E2E8F0;
+`
+
+const Tab = styled.button<{ $active: boolean }>`
+  padding: 15px 20px;
+  background: none;
+  border: none;
+  border-bottom: ${props => props.$active ? '2px solid #2D3748' : 'none'};
+  color: ${props => props.$active ? '#2D3748' : '#718096'};
+  font-weight: ${props => props.$active ? '600' : '400'};
+  cursor: pointer;
+`
+
+const TabContent = styled.div`
+  padding: 20px 0;
+  line-height: 1.6;
+  color: #4A5568;
 `
 
 const Loading = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  font-size: ${props => props.theme.typography.h3};
-  color: ${props => props.theme.colors.text.secondary};
+  text-align: center;
+  padding: 60px 20px;
 `
 
 const Error = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  font-size: ${props => props.theme.typography.h3};
-  color: ${props => props.theme.colors.error};
+  text-align: center;
+  padding: 60px 20px;
+  color: #E53E3E;
 `
+
+type TabType = 'description' | 'authors' | 'reviews'
 
 export const BookDetails: React.FC = () => {
   const { isbn13 } = useParams<{ isbn13: string }>()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { currentBook, loading, error } = useSelector((state: RootState) => state.books)
   const { bookmarks } = useSelector((state: RootState) => state.user)
   const { items: cartItems } = useSelector((state: RootState) => state.cart)
+  
+  const [activeTab, setActiveTab] = useState<TabType>('description')
 
   const isInBookmarks = bookmarks.some(book => book.isbn13 === currentBook?.isbn13)
   const isInCart = cartItems.some(item => item.book.isbn13 === currentBook?.isbn13)
@@ -225,81 +154,86 @@ export const BookDetails: React.FC = () => {
     }
   }
 
-  if (loading) return <Loading>Loading book details...</Loading>
+  const handleBack = () => {
+    navigate(-1)
+  }
+
+  if (loading) return <Loading>Loading...</Loading>
   if (error) return <Error>Error: {error}</Error>
-  if (!currentBook) return <div>Book not found</div>
+  if (!currentBook) return <Error>Book not found</Error>
 
   return (
     <Container>
-      <DetailsGrid>
-        <ImageSection>
-          <BookImage 
-            src={currentBook.image} 
-            alt={currentBook.title}
-
-          />
-            <Overlay>
-              <BookmarkButton
-                $active={isInBookmarks}
-                onClick={handleAddToBookmarks}
-              >
-                {isInBookmarks ? <img src={BookmarkActiveIcon} alt="" /> : <img src={BookmarkIcon} alt="" />}
-              </BookmarkButton>
-          </Overlay>
-        </ImageSection>
+      <BackButton onClick={handleBack}>←</BackButton>
+      
+      <Content>
+        <BookCover>
+          <BookImage src={currentBook.image} alt={currentBook.title} />
+        </BookCover>
         
-        <InfoSection>
+        <BookInfo>          
+          <Price>{currentBook.price}</Price>
           <Title>{currentBook.title}</Title>
-          <Subtitle>{currentBook.subtitle}</Subtitle>
+          {currentBook.subtitle && <p>{currentBook.subtitle}</p>}
           
-          <MetaGrid>
-            <MetaItem>
-              <MetaLabel>Authors</MetaLabel>
-              <span>{currentBook.authors}</span>
-            </MetaItem>
-            <MetaItem>
-              <MetaLabel>Publisher</MetaLabel>
-              <span>{currentBook.publisher}</span>
-            </MetaItem>
-            <MetaItem>
-              <MetaLabel>Pages</MetaLabel>
-              <span>{currentBook.pages}</span>
-            </MetaItem>
-            <MetaItem>
-              <MetaLabel>Year</MetaLabel>
-              <span>{currentBook.year}</span>
-            </MetaItem>
-            <MetaItem>
-              <MetaLabel>Rating</MetaLabel>
-              <span>⭐ {currentBook.rating}</span>
-            </MetaItem>
-          </MetaGrid>
+          <div>
+            <p><strong>Authors:</strong> {currentBook.authors}</p>
+            <p><strong>Publisher:</strong> {currentBook.publisher}</p>
+            <p><strong>Year:</strong> {currentBook.year}</p>
+            <p><strong>Pages:</strong> {currentBook.pages}</p>
+            <p><strong>Rating:</strong> ⭐ {currentBook.rating}/5</p>
+          </div>
 
-          <PriceSection>
-            <Price>{currentBook.price}</Price>
-            <Actions>
-              <ActionButton 
-                $variant="bookmark"
-                $active={isInBookmarks}
-                onClick={handleAddToBookmarks}
-              >
-                {isInBookmarks ? '♥ Remove from Bookmarks' : '♥ Add to Bookmarks'}
-              </ActionButton>
-              <ActionButton 
-                $variant="cart"
-                $active={isInCart}
-                onClick={handleAddToCart}
-              >
-                {isInCart ? '✓ Added to Cart' : '+ Add to Cart'}
-              </ActionButton>
-            </Actions>
-          </PriceSection>
-        </InfoSection>
-            <Description>
-            <h3>Description</h3>
+
+          
+          <Actions>
+            <Button $primary onClick={handleAddToCart}>
+              {isInCart ? 'In Cart' : 'Add to Cart'}
+            </Button>
+            <Button onClick={handleAddToBookmarks}>
+              {isInBookmarks ? 'Bookmarked' : 'Bookmark'}
+            </Button>
+          </Actions>
+        </BookInfo>
+      </Content>
+
+      {/* Табы */}
+      <Tabs>
+        <TabHeaders>
+          <Tab 
+            $active={activeTab === 'description'}
+            onClick={() => setActiveTab('description')}
+          >
+            Description
+          </Tab>
+          <Tab 
+            $active={activeTab === 'authors'}
+            onClick={() => setActiveTab('authors')}
+          >
+            Authors
+          </Tab>
+          <Tab 
+            $active={activeTab === 'reviews'}
+            onClick={() => setActiveTab('reviews')}
+          >
+            Reviews
+          </Tab>
+        </TabHeaders>
+        
+        <TabContent>
+          {activeTab === 'description' && (
             <p>{currentBook.desc}</p>
-          </Description>
-      </DetailsGrid>
+          )}
+          
+          {activeTab === 'authors' && (
+            <p>{currentBook.authors}</p>
+          )}
+          
+          {activeTab === 'reviews' && (
+            <p>No reviews yet.</p>
+          )}
+        </TabContent>
+      </Tabs>
     </Container>
   )
 }

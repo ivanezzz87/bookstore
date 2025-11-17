@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import type { User, AuthCredentials} from '../../types/user'
+import type { User, AuthCredentials, LoginResponse, SignupResponse } from '../../types/user'
 import type { Book } from '../../types/book'
 
 interface UserState {
@@ -8,6 +8,8 @@ interface UserState {
   loading: boolean
   error: string | null
   bookmarks: Book[]
+  accessToken: string | null
+  refreshToken: string | null
 }
 
 const initialState: UserState = {
@@ -15,7 +17,9 @@ const initialState: UserState = {
   isAuthenticated: false,
   loading: false,
   error: null,
-  bookmarks: []
+  bookmarks: [],
+  accessToken: null,
+  refreshToken: null
 }
 
 const userSlice = createSlice({
@@ -26,36 +30,48 @@ const userSlice = createSlice({
       state.loading = true
       state.error = null
     },
-    loginSuccess: (state, action: PayloadAction<User>) => {
-      state.user = action.payload
+    loginSuccess: (state, action: PayloadAction<{ user: User; tokens: LoginResponse }>) => {
+      state.user = action.payload.user
       state.isAuthenticated = true
       state.loading = false
       state.error = null
+      state.accessToken = action.payload.tokens.access
+      state.refreshToken = action.payload.tokens.refresh
     },
     loginFailure: (state, action: PayloadAction<string>) => {
       state.loading = false
       state.error = action.payload
       state.isAuthenticated = false
+      state.accessToken = null
+      state.refreshToken = null
     },
     signupStart: (state, action: PayloadAction<AuthCredentials>) => {
       state.loading = true
       state.error = null
     },
-    signupSuccess: (state, action: PayloadAction<User>) => {
-      state.user = action.payload
+    signupSuccess: (state, action: PayloadAction<{ user: User; tokens: LoginResponse }>) => {
+      state.user = action.payload.user
       state.isAuthenticated = true
       state.loading = false
       state.error = null
+      state.accessToken = action.payload.tokens.access
+      state.refreshToken = action.payload.tokens.refresh
     },
     signupFailure: (state, action: PayloadAction<string>) => {
       state.loading = false
       state.error = action.payload
+      state.accessToken = null
+      state.refreshToken = null
     },
     logout: (state) => {
       state.user = null
       state.isAuthenticated = false
       state.bookmarks = []
+      state.accessToken = null
+      state.refreshToken = null
       localStorage.removeItem('user')
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
     },
     addToBookmarks: (state, action: PayloadAction<Book>) => {
       if (!state.bookmarks.find(book => book.isbn13 === action.payload.isbn13)) {
@@ -67,6 +83,9 @@ const userSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null
+    },
+    refreshTokenSuccess: (state, action: PayloadAction<{ access: string }>) => {
+      state.accessToken = action.payload.access
     }
   }
 })
@@ -81,7 +100,8 @@ export const {
   logout,
   addToBookmarks,
   removeFromBookmarks,
-  clearError
+  clearError,
+  refreshTokenSuccess
 } = userSlice.actions
 
 export default userSlice.reducer

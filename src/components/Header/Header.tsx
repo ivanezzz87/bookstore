@@ -148,10 +148,10 @@ export const Header: React.FC = () => {
 
         <Nav>
           <NavButton 
-            $active={location.pathname === '/bookmarks'}
-            onClick={() => navigate('/bookmarks')}
+            $active={location.pathname === '/favorites'}
+            onClick={() => navigate('/favorites')}
           >
-            <img src={BookmarkIcon} alt="Bookmarks" /> {bookmarksCount > 0 && `(${bookmarksCount})`}
+            <img src={BookmarkIcon} alt="Favorites" /> {bookmarksCount > 0 && `(${bookmarksCount})`}
           </NavButton>
           
           <NavButton 
@@ -162,11 +162,15 @@ export const Header: React.FC = () => {
           </NavButton>
 
           {isAuthenticated ? (
-            <NavButton $active={false}>
+            <NavButton $active={false}
+            onClick={() => navigate('/account')}
+            >
               <img src={UserIcon} alt="Profile" />
             </NavButton>
           ) : (
-            <NavButton $active={false}>
+            <NavButton $active={false}
+              onClick={() => navigate('/auth')}
+            >
               Login
             </NavButton>
           )}

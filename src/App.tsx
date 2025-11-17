@@ -1,23 +1,23 @@
-import React from 'react'
-import styled, { ThemeProvider } from 'styled-components'
-import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
-import { store } from './store'
-import { theme } from './types/theme'
-import { GlobalStyles } from './styles/global'
-import { AppRouter } from './router/AppRouter'
-import { Header } from './components/Header/Header'
-
+import React from "react";
+import styled, { ThemeProvider } from "styled-components";
+import { Provider } from "react-redux";
+import { BrowserRouter } from "react-router-dom";
+import { store } from "./store";
+import { theme } from "./types/theme";
+import { GlobalStyles } from "./styles/global";
+import { AppRouter } from "./router/AppRouter";
+import { Header } from "./components/Header/Header";
+import { Footer } from "./components/Footer/Footer";
 const AppContainer = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-`
+`;
 
 const Main = styled.main`
   flex: 1;
-  background: ${props => props.theme.colors.background};
-`
+  background: ${(props) => props.theme.colors.bwhite};
+`;
 
 const App: React.FC = () => {
   return (
@@ -30,11 +30,12 @@ const App: React.FC = () => {
             <Main>
               <AppRouter />
             </Main>
+            <Footer />
           </AppContainer>
         </BrowserRouter>
       </ThemeProvider>
     </Provider>
-  )
-}
+  );
+};
 
-export default App
+export default App;

@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import UserInfo from "./UserInfo";
 import { useNavigate} from "react-router-dom";
 interface BurgerMenuProps {
   $isOpen: boolean;
@@ -18,7 +17,6 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ $isOpen, onClick }) => {
       </BurgerButton>
       <MenuOverlay isOpen={$isOpen}>
         <NavContainer>
-          <UserInfo firstName="Ivan" lastName="Dudko" />
           <MenuItem onClick={() => navigate("/")}>
             Home
           </MenuItem>

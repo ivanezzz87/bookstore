@@ -313,9 +313,7 @@ export const Cart: React.FC = () => {
                 />
                 <BookInfo>
                   <BookTitle>{item.book.title}</BookTitle>
-                    {item.book.subtitle && <BookAuthor>{item.book.subtitle}</BookAuthor>}
-                
-                  
+                    {item.book.subtitle && <BookAuthor>{item.book.subtitle}</BookAuthor>}     
                   <QuantityControls>
                     <QuantityButton
                       onClick={() => handleQuantityChange(item.book.isbn13, item.quantity - 1)}
@@ -338,7 +336,7 @@ export const Cart: React.FC = () => {
                 </QuantityControls>
               </BookInfo>
               <BookPrice>{item.book.price}</BookPrice>
-                                  <RemoveButton onClick={() => handleRemoveItem(item.book.isbn13)}>
+                  <RemoveButton onClick={() => handleRemoveItem(item.book.isbn13)}>
                     X
                   </RemoveButton>
             </CartItemCard>
