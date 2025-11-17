@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { useNavigate} from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store";
 interface BurgerMenuProps {
   $isOpen: boolean;
   onClick: () => void;
@@ -8,6 +10,7 @@ interface BurgerMenuProps {
 
 const BurgerMenu: React.FC<BurgerMenuProps> = ({ $isOpen, onClick }) => {
   const navigate = useNavigate();
+ const { isAuthenticated } = useSelector((state: RootState) => state.user)
   return (
     <>
       <BurgerButton isOpen={$isOpen} onClick={onClick}>
@@ -20,9 +23,25 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ $isOpen, onClick }) => {
           <MenuItem onClick={() => navigate("/")}>
             Home
           </MenuItem>
-          <MenuItem onClick={onClick}>
-            Add post
+          <MenuItem onClick={() => navigate("/favorites")}>
+            Favorites
           </MenuItem>
+          <MenuItem onClick={() => navigate("/cart")}>
+            Cart
+          </MenuItem>
+          {isAuthenticated ? (
+            <MenuItem 
+              onClick={() => navigate('/account')}
+            >
+              Profile
+            </MenuItem>
+          ) : (
+            <MenuItem
+              onClick={() => navigate('/auth')}
+            >
+              Login
+            </MenuItem>
+          )}
         </NavContainer>
       </MenuOverlay>
     </>
@@ -50,7 +69,7 @@ const BurgerButton = styled.button<{ isOpen: boolean }>`
 const BurgerLine = styled.div<{ isOpen: boolean }>`
   width: 30px;
   height: 3px;
-  background: ${(props) => (props.isOpen ? "#fff" : "#fff")};
+  background: ${(props) => (props.isOpen ? props.theme.colors.primary : props.theme.colors.primary)};
   border-radius: 5px;
   transition: all 0.3s ease;
   position: absolute;
@@ -77,10 +96,10 @@ const BurgerLine = styled.div<{ isOpen: boolean }>`
 const MenuOverlay = styled.div<{ isOpen: boolean }>`
   position: fixed;
   top: 84px;
-  left: 0;
+  right: 0;
   width: 236px;
   height: 100%;
-  background: var(--bg-color);;
+  background: ${(props) => props.theme.colors.bwhite};
   display: ${(props) => (props.isOpen ? "flex" : "none")};
   flex-direction: row;
   z-index: 5;

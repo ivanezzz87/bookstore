@@ -8,6 +8,8 @@ import SearchIcon from '../../assets/Search.svg';
 import BookmarkIcon from '../../assets/Favourites.svg';
 import CartIcon from '../../assets/Cart.svg';
 import UserIcon from '../../assets/User.svg';
+import BurgerMenu from '../Simple/Burger';
+
 const HeaderContainer = styled.header`
   background: ${props => props.theme.colors.bwhite};
   border-bottom: 1px solid ${props => props.theme.colors.borderDefault};
@@ -46,6 +48,11 @@ const SearchForm = styled.form`
   padding: 4px;
   border: 1px solid ${props => props.theme.colors.borderDefault};
   flex: 0 1 400px;
+
+  @media (max-width: 768px) {
+    flex: 1;
+    margin: 0 10px;
+  }
 `
 
 const SearchInput = styled.input`
@@ -84,6 +91,10 @@ const Nav = styled.nav`
   display: flex;
   align-items: center;
   gap: ${props => props.theme.spacing.md};
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `
 
 const NavButton = styled.button<{ $active: boolean }>`
@@ -92,13 +103,15 @@ const NavButton = styled.button<{ $active: boolean }>`
   color: ${props => 
     props.$active 
       ? props.theme.colors.primary 
-      : props.theme.colors.text.secondary
-  };
+      : props.theme.colors.text.secondary};
   padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.md};
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: ${props => props.theme.typography.small};
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 
   &:hover {
     color: ${props => props.theme.colors.text.primary};
@@ -106,8 +119,18 @@ const NavButton = styled.button<{ $active: boolean }>`
   }
 `
 
+const MobileNav = styled.div`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+  }
+`
+
 export const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
+  const [isBurgerOpen, setIsBurgerOpen] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
@@ -122,6 +145,15 @@ export const Header: React.FC = () => {
       dispatch(searchBooksStart({ query: searchQuery.trim() }))
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
     }
+  }
+
+  const handleBurgerToggle = () => {
+    setIsBurgerOpen(!isBurgerOpen)
+  }
+
+  const handleNavClick = (path: string) => {
+      navigate(path)
+      setIsBurgerOpen(false)
   }
 
   const cartItemsCount = cartItems.reduce((total, item) => total + item.quantity, 0)
@@ -146,24 +178,27 @@ export const Header: React.FC = () => {
           </SearchButton>
         </SearchForm>
 
+        {/* Десктопная навигация */}
         <Nav>
           <NavButton 
             $active={location.pathname === '/favorites'}
             onClick={() => navigate('/favorites')}
           >
-            <img src={BookmarkIcon} alt="Favorites" /> {bookmarksCount > 0 && `(${bookmarksCount})`}
+            <img src={BookmarkIcon} alt="Favorites" /> 
+          {bookmarksCount > 0 && `(${bookmarksCount})`}
           </NavButton>
           
           <NavButton 
             $active={location.pathname === '/cart'}
             onClick={() => navigate('/cart')}
           >
-            <img src={CartIcon} alt="Cart" /> {cartItemsCount > 0 && `(${cartItemsCount})`}
+            <img src={CartIcon} alt="Cart" /> 
+          {cartItemsCount > 0 && `(${cartItemsCount})`}
           </NavButton>
 
           {isAuthenticated ? (
             <NavButton $active={false}
-            onClick={() => navigate('/account')}
+              onClick={() => navigate('/account')}
             >
               <img src={UserIcon} alt="Profile" />
             </NavButton>
@@ -175,6 +210,14 @@ export const Header: React.FC = () => {
             </NavButton>
           )}
         </Nav>
+
+        {/* Мобильная навигация - используем компонент BurgerMenu */}
+        <MobileNav>
+          <BurgerMenu 
+            $isOpen={isBurgerOpen} 
+            onClick={handleBurgerToggle}
+          />
+        </MobileNav>
       </HeaderContent>
     </HeaderContainer>
   )
