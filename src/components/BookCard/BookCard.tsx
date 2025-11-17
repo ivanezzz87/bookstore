@@ -66,8 +66,8 @@ const BookmarkButton = styled.button<{ $active: boolean }>`
   cursor: pointer;
   color: ${props => 
     props.$active 
-      ? props.theme.colors.secondary 
-      : props.theme.colors.text.secondary
+      ? props.theme.colors.primary2
+      : props.theme.colors.bwhite
   };
   font-size: 16px;
   transition: all 0.3s ease;
