@@ -250,7 +250,6 @@ export const Home: React.FC = () => {
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
-        showPageInfo={true}
         showNavigation={true}
       />
     </HomeContainer>

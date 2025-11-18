@@ -148,14 +148,12 @@ const CartSummaryContainer = styled.div`
 `
 
 const CartSummary = styled.div`
+  margin-left: auto;
   width: 30%;
   background: ${props => props.theme.colors.bwhite};
   padding: ${props => props.theme.spacing.lg};
   height: fit-content;
   border-radius: ${props => props.theme.borderRadius.md};
-  position: absolute;
-  top: 100%;
-  right: 0;
 `
 
 const SummaryRow = styled.div`

@@ -14,6 +14,8 @@ export interface BookDetails extends Book {
   year: string
   rating: string
   desc: string
+  language: string
+  format: string
   pdf?: {
     [key: string]: string
   }

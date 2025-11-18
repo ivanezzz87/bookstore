@@ -114,8 +114,8 @@ const Footer = styled.div`
 
 const Price = styled.span`
   font-size: 18px;
-  font-weight: 700;
-  color: ${props => props.theme.colors.secondary};
+  font-weight: 400;
+  color: ${props => props.theme.colors.primary};
 `
 
 const CartButton = styled.button<{ $active: boolean }>`

@@ -19,8 +19,7 @@ const AuthContainer = styled.div`
 `
 
 const AuthCard = styled.div`
-  background: white;
-
+  background: ${props => props.theme.colors.bwhite};
   width: 100%;
   max-width: 440px;
   overflow: hidden;
@@ -28,7 +27,7 @@ const AuthCard = styled.div`
 
 const TabsContainer = styled.div`
   display: flex;
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 1px solid ${props => props.theme.colors.borderDefault};
 `
 
 const Tab = styled.button<{ $active: boolean }>`
@@ -79,7 +78,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   font-size: 14px;
   font-weight: 600;
-  color: #2D3748;
+  color: ${props => props.theme.colors.text.primary};
   margin-bottom: 4px;
 `
 
@@ -113,7 +112,6 @@ const SubmitButton = styled.button`
   color: ${props => props.theme.colors.bwhite};
   border: none;
   padding: 14px 20px;
-  border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -126,15 +124,15 @@ const SubmitButton = styled.button`
   }
   
   &:disabled {
-    background: #CBD5E0;
+    background: ${props => props.theme.colors.bgrey};
     cursor: not-allowed;
     transform: none;
   }
 `
 
 const GlobalError = styled.div`
-  background: #FED7D7;
-  border: 1px solid #FEB2B2;
+  background: ${props => props.theme.colors.error};
+  border: 1px solid ${props => props.theme.colors.error};
   color: ${props => props.theme.colors.error};
   padding: 12px 16px;
   border-radius: 8px;
@@ -255,6 +253,7 @@ export const Auth: React.FC = () => {
 const handleRegister = (e: React.FormEvent) => {
   e.preventDefault()
   if (validateRegisterForm()) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirmPassword, ...signupData } = registerData
     // Убедитесь, что передаем правильные данные
     dispatch(signupStart({

@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from '../store'
 import { fetchBookDetailsStart } from '../store/books/bookSlice'
 import { useBookstoreHandlers } from '../hooks/useHandlers'
+import { StarRating } from '../components/Simple/StarsRating'
+import { MoreInfo } from '../components/Simple/MoreInfo'
 
 const Container = styled.div`
   max-width: 800px;
@@ -58,12 +60,18 @@ const Title = styled.h1`
 `
 
 const Price = styled.div`
-  font-size: 28px;
-  font-weight: 700;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
   color: ${props => props.theme.colors.primary};
   margin: 20px 0;
 `
 
+const DescriptionContainer = styled.div`
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  justify-content: space-between;
+`
 const Actions = styled.div`
   display: flex;
   gap: 15px;
@@ -81,6 +89,7 @@ const Button = styled.button<{ $primary?: boolean }>`
 `
 
 const Tabs = styled.div`
+  font-family: 'Inter', sans-serif;
   margin-top: 30px;
 `
 
@@ -153,19 +162,33 @@ export const BookDetails: React.FC = () => {
           <BookImage src={currentBook.image} alt={currentBook.title} />
         </BookCover>
         
-        <BookInfo>          
-          <Price>{currentBook.price}</Price>
+        <BookInfo>
+          <DescriptionContainer>
+            <Price>{currentBook.price}</Price>
+            <StarRating 
+               rating={parseFloat(currentBook.rating)} 
+               size={20}
+               showValue={true}
+            />
+          </DescriptionContainer>          
           <Title>{currentBook.title}</Title>
-          {currentBook.subtitle && <p>{currentBook.subtitle}</p>}
-          
-          <div>
-            <p><strong>Authors:</strong> {currentBook.authors}</p>
-            <p><strong>Publisher:</strong> {currentBook.publisher}</p>
-            <p><strong>Year:</strong> {currentBook.year}</p>
-            <p><strong>Pages:</strong> {currentBook.pages}</p>
-            <p><strong>Rating:</strong> ⭐ {currentBook.rating}/5</p>
-          </div>
-
+          <DescriptionContainer>
+              <p>Authors</p> 
+              <p>{currentBook.authors}</p>
+          </DescriptionContainer>
+          <DescriptionContainer>
+              <p>Publisher</p> 
+              <p>{currentBook.publisher}, {currentBook.year} </p>
+          </DescriptionContainer>
+          <DescriptionContainer>
+              <p>Language</p> 
+              <p>{currentBook.language || 'English'}</p>
+          </DescriptionContainer>
+          <DescriptionContainer>
+              <p>Format</p> 
+              <p>{currentBook.format || 'PDF'}</p>
+          </DescriptionContainer>
+          <MoreInfo book={currentBook} />
           <Actions>
             {/* Передаем currentBook в обработчики */}
             <Button 

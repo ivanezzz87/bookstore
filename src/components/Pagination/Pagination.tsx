@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import type { PaginationProps } from '../../types/pagination';
 
 const PaginationContainer = styled.div`
   display: flex;
@@ -10,9 +11,13 @@ const PaginationContainer = styled.div`
 `
 
 const PageButton = styled.button<{ $active?: boolean; $disabled?: boolean }>`
-  background-color: ${props => props.$active ? props.theme.colors.primary : 'transparent'};
-  border: 1px solid ${props => props.$active ? props.theme.colors.primary : props.theme.colors.borderDefault};
-  color: ${props => props.$active ? 'white' : props.theme.colors.text.primary};
+  background-color: ${props => props.theme.colors.bwhite};
+  border: none;
+  color: ${props => {
+    if (props.$active) return props.theme.colors.secondary;
+    if (props.$disabled) return props.theme.colors.text.primary;
+    return props.theme.colors.text.primary;
+  }};
   padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.md};
   font-size: ${props => props.theme.typography.small};
   font-weight: 600;
@@ -27,8 +32,7 @@ const PageButton = styled.button<{ $active?: boolean; $disabled?: boolean }>`
   justify-content: center;
 
   &:hover:not(:disabled) {
-    background-color: ${props => props.$active ? props.theme.colors.secondary : props.theme.colors.bwhite};
-    border-color: ${props => props.$active ? props.theme.colors.secondary : props.theme.colors.primary};
+    color: ${props => props.$active ? props.theme.colors.secondary : props.theme.colors.primary};
     transform: ${props => props.$active ? 'none' : 'translateY(-2px)'};
   }
 
@@ -37,10 +41,14 @@ const PageButton = styled.button<{ $active?: boolean; $disabled?: boolean }>`
   }
 `
 
-const PageInfo = styled.span`
-  font-size: ${props => props.theme.typography.small};
-  color: ${props => props.theme.colors.text.secondary};
-  margin: 0 ${props => props.theme.spacing.md};
+const NavigationButton = styled(PageButton)<{ $disabled?: boolean }>`
+  background-color: ${props => props.theme.colors.bwhite};
+  border: none;
+  color: ${props => props.$disabled ? props.theme.colors.text.secondary : props.theme.colors.text.primary};
+  
+  &:hover:not(:disabled) {
+    color: ${props => props.theme.colors.primary};
+  }
 `
 
 const Dots = styled.span`
@@ -49,19 +57,10 @@ const Dots = styled.span`
   font-weight: 600;
 `
 
-interface PaginationProps {
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number) => void
-  showPageInfo?: boolean
-  showNavigation?: boolean
-}
-
 export const Pagination: React.FC<PaginationProps> = ({
   currentPage,
   totalPages,
   onPageChange,
-  showPageInfo = true,
   showNavigation = true
 }) => {
   if (totalPages <= 1) return null
@@ -72,17 +71,15 @@ export const Pagination: React.FC<PaginationProps> = ({
     }
 
     const pages: (number | string)[] = []
-    const delta = 1
+    const delta = 2
 
-    // Always show first page
+    // Всегда показываем первую страницу
     pages.push(1)
 
-    // Show dots if needed before middle pages
     if (currentPage - delta > 2) {
       pages.push('...')
     }
 
-    // Show pages around current page
     for (
       let i = Math.max(2, currentPage - delta);
       i <= Math.min(totalPages - 1, currentPage + delta);
@@ -91,12 +88,12 @@ export const Pagination: React.FC<PaginationProps> = ({
       pages.push(i)
     }
 
-    // Show dots if needed after middle pages
+    // Показываем точки, если необходимо
     if (currentPage + delta < totalPages - 1) {
       pages.push('...')
     }
 
-    // Always show last page
+    // Всегда показываем последнюю страницу
     if (totalPages > 1) {
       pages.push(totalPages)
     }
@@ -116,16 +113,19 @@ export const Pagination: React.FC<PaginationProps> = ({
     }
   }
 
+  const isPreviousDisabled = currentPage === 1
+  const isNextDisabled = currentPage === totalPages
+
   return (
     <PaginationContainer>
       {showNavigation && (
-        <PageButton
+        <NavigationButton
           onClick={handlePrevious}
-          $disabled={currentPage === 1}
-          disabled={currentPage === 1}
+          $disabled={isPreviousDisabled}
+          disabled={isPreviousDisabled}
         >
           ← Prev
-        </PageButton>
+        </NavigationButton>
       )}
       
       {getVisiblePages().map((page, index) =>
@@ -143,19 +143,13 @@ export const Pagination: React.FC<PaginationProps> = ({
       )}
       
       {showNavigation && (
-        <PageButton
+        <NavigationButton
           onClick={handleNext}
-          $disabled={currentPage === totalPages}
-          disabled={currentPage === totalPages}
+          $disabled={isNextDisabled}
+          disabled={isNextDisabled}
         >
           Next →
-        </PageButton>
-      )}
-      
-      {showPageInfo && (
-        <PageInfo>
-          Page {currentPage} of {totalPages}
-        </PageInfo>
+        </NavigationButton>
       )}
     </PaginationContainer>
   )
