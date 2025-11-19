@@ -1,35 +1,15 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import type { User, AuthCredentials, LoginResponse } from '../../types/user'
+import { type User, type AuthCredentials, type LoginResponse, initialState } from '../../types/user'
 import type { Book } from '../../types/book'
-
-interface UserState {
-  user: User | null
-  isAuthenticated: boolean
-  loading: boolean
-  error: string | null
-  bookmarks: Book[]
-  accessToken: string | null
-  refreshToken: string | null
-}
-
-const initialState: UserState = {
-  user: null,
-  isAuthenticated: false,
-  loading: false,
-  error: null,
-  bookmarks: [],
-  accessToken: null,
-  refreshToken: null
-}
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     loginStart: (state, action: PayloadAction<AuthCredentials>) => {
       state.loading = true
       state.error = null
+      console.log(action.type)
     },
     loginSuccess: (state, action: PayloadAction<{ user: User; tokens: LoginResponse }>) => {
       state.user = action.payload.user
@@ -46,10 +26,10 @@ const userSlice = createSlice({
       state.accessToken = null
       state.refreshToken = null
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     signupStart: (state, action: PayloadAction<AuthCredentials>) => {
       state.loading = true
       state.error = null
+      console.log(action.type)
     },
     signupSuccess: (state, action: PayloadAction<{ user: User; tokens: LoginResponse }>) => {
       state.user = action.payload.user

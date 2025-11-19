@@ -43,10 +43,10 @@ const booksSlice = createSlice({
       state.currentPage = 1
       state.totalPages = 0
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fetchBookDetailsStart: (state, action: PayloadAction<string>) => {
       state.loading = true
       state.error = null
+      console.log(action.type)
     },
     fetchBookDetailsSuccess: (state, action: PayloadAction<BookDetails>) => {
       state.currentBook = action.payload

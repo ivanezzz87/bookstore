@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { RefreshTokenResponse, UserInfoResponse } from '../types/api'
 import type { Book, BookDetails, BooksResponse } from '../types/book'
 import type { AuthCredentials, LoginResponse, SignupResponse } from '../types/user'
-import { checkResponse, createApiError, getAuthHeaders } from './functions'
+import { checkResponse, createApiError } from './functions'
 
 const API_BASE = 'https://api.itbook.store/1.0'
 const API_BASE_URL = 'https://studapi.teachmeskills.by'
