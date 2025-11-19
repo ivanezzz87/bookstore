@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-const currentYear = new Date().getFullYear();
+import { currentYear } from "../../helpers/functions";
+
 export const Footer: React.FC = () => {
   return (
     <StyledFooter>

@@ -7,10 +7,10 @@ import {
   restoreCart
 } from '../store/cart/cartSlice'
 import type { RootState } from '../store'
-import type { CartState } from '../types/card'
 
+// Используем тип из store, а не из types/card
 function* saveCartToLocalStorage() {
-  const cart: CartState = yield select((state: RootState) => state.cart)
+  const cart: RootState['cart'] = yield select((state: RootState) => state.cart)
   try {
     localStorage.setItem('cart', JSON.stringify(cart))
   } catch (error) {
@@ -22,13 +22,14 @@ function* loadCartFromLocalStorage() {
   try {
     const cartStr: string | null = yield call([localStorage, 'getItem'], 'cart')
     if (cartStr) {
-      const cart: CartState = JSON.parse(cartStr)
+      const cart: RootState['cart'] = JSON.parse(cartStr)
       yield put(restoreCart(cart))
     }
   } catch (error) {
     console.error('Failed to load cart from localStorage:', error)
   }
 }
+
 export function* watchCartSaga(): Generator<unknown, void, unknown> {
   yield takeEvery([
     addToCart.type,

@@ -38,6 +38,8 @@ const Content = styled.div`
 `
 
 const BookCover = styled.div`
+  background-color: ${props => props.theme.colors.orange};
+  position: relative;
   flex-shrink: 0;
   width: 250px;
 `
@@ -83,11 +85,34 @@ const Button = styled.button<{ $primary?: boolean }>`
   border: ${props => props.$primary ? 'none' : '1px solid #2D3748'};
   background: ${props => props.$primary ? '#2D3748' : 'transparent'};
   color: ${props => props.$primary ? 'white' : '#2D3748'};
-  border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
 `
+const BookmarkButton = styled.button<{ $active: boolean }>`
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: ${props => props.theme.colors.primary};
+  border: none;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: ${props => 
+    props.$active 
+      ? props.theme.colors.primary2
+      : props.theme.colors.bwhite
+  };
+  font-size: 16px;
+  transition: all 0.3s ease;
 
+  &:hover {
+    background: ${props => props.theme.colors.primary};
+    color: white;
+  }
+`
 const Tabs = styled.div`
   font-family: 'Inter', sans-serif;
   margin-top: 30px;
@@ -160,6 +185,13 @@ export const BookDetails: React.FC = () => {
       <Content>
         <BookCover>
           <BookImage src={currentBook.image} alt={currentBook.title} />
+          <BookmarkButton 
+            $active={isBookInBookmarks(currentBook)}
+            onClick={() => handleAddToBookmarks(currentBook)}
+            title={isBookInBookmarks(currentBook) ? "Remove from bookmarks" : "Add to bookmarks"}
+          >
+            ♥
+          </BookmarkButton>
         </BookCover>
         
         <BookInfo>
@@ -196,11 +228,6 @@ export const BookDetails: React.FC = () => {
               onClick={() => handleAddToCart(currentBook)}
             >
               {isBookInCart(currentBook) ? 'In Cart' : 'Add to Cart'}
-            </Button>
-            <Button 
-              onClick={() => handleAddToBookmarks(currentBook)}
-            >
-              {isBookInBookmarks(currentBook) ? 'Bookmarked' : 'Bookmark'}
             </Button>
           </Actions>
         </BookInfo>

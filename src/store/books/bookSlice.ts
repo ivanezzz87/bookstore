@@ -1,28 +1,5 @@
-// store/books/bookSlice.ts
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import type { Book, BookDetails, BooksResponse } from '../../types/book'
-
-interface BooksState {
-  newReleases: Book[]
-  searchResults: Book[]
-  currentBook: BookDetails | null
-  loading: boolean
-  error: string | null
-  searchQuery: string
-  totalPages: number
-  currentPage: number
-}
-
-const initialState: BooksState = {
-  newReleases: [],
-  searchResults: [],
-  currentBook: null,
-  loading: false,
-  error: null,
-  searchQuery: '',
-  totalPages: 0,
-  currentPage: 1
-}
+import { initialState, type Book, type BookDetails, type BooksResponse } from '../../types/book'
 
 const booksSlice = createSlice({
   name: 'books',
@@ -50,7 +27,7 @@ const booksSlice = createSlice({
       state.searchResults = action.payload.books || []
       // API возвращает total, но не возвращает totalPages, поэтому вычисляем
       const totalItems = parseInt(action.payload.total) || 0
-      state.totalPages = Math.ceil(totalItems / 10) // Ваш API возвращает по 10 книг на страницу
+      state.totalPages = Math.ceil(totalItems / 10) // возвращает по 10 книг на страницу
       state.loading = false
     },
     searchBooksFailure: (state, action: PayloadAction<string>) => {
@@ -66,6 +43,7 @@ const booksSlice = createSlice({
       state.currentPage = 1
       state.totalPages = 0
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fetchBookDetailsStart: (state, action: PayloadAction<string>) => {
       state.loading = true
       state.error = null

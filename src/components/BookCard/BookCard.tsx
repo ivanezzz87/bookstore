@@ -1,15 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import type { Book } from '../../types/book'
-
-interface BookCardProps {
-  book: Book
-  onBookClick: (isbn13: string) => void
-  onAddToCart: (book: Book) => void
-  onAddToBookmarks: (book: Book) => void
-  isInCart?: boolean
-  isInBookmarks?: boolean
-}
+import type { BookCardProps } from '../../types/book'
 
 const Card = styled.div`
   background: ${props => props.theme.colors.surface};

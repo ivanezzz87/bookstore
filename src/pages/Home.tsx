@@ -1,4 +1,3 @@
-// pages/Home/Home.tsx
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'

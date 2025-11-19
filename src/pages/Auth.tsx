@@ -255,7 +255,6 @@ const handleRegister = (e: React.FormEvent) => {
   if (validateRegisterForm()) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirmPassword, ...signupData } = registerData
-    // Убедитесь, что передаем правильные данные
     dispatch(signupStart({
       username: signupData.username,
       email: signupData.email,

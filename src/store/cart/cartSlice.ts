@@ -1,20 +1,8 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import type { CartItem } from '../../types/card'
+import { initialState, type CartItem, type CartState } from '../../types/card'
 import type { Book } from '../../types/book'
 
-interface CartState {
-  items: CartItem[]
-  total: number
-  vat: number
-  totalWithVat: number
-}
 const VAT_RATE = 0.15;
-const initialState: CartState = {
-  items: [],
-  total: 0,
-  vat: 0,
-  totalWithVat: 0
-}
 
 const calculateTotal = (items: CartItem[]): number => {
   return items.reduce((total, item) => {

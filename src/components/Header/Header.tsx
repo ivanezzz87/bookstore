@@ -151,11 +151,6 @@ export const Header: React.FC = () => {
     setIsBurgerOpen(!isBurgerOpen)
   }
 
-  const handleNavClick = (path: string) => {
-      navigate(path)
-      setIsBurgerOpen(false)
-  }
-
   const cartItemsCount = cartItems.reduce((total, item) => total + item.quantity, 0)
   const bookmarksCount = bookmarks.length
 

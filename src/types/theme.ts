@@ -7,6 +7,7 @@ export const theme = {
     bgrey: "#E7E7E7",
     blight: "#F7F7F7",
     surface: "#D7E4FD",
+    orange: "#FEE9E2",
     text: {
       primary: "#313037",
       primary2: "#5B5A62",

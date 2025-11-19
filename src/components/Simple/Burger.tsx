@@ -3,11 +3,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store";
-
-interface BurgerMenuProps {
-  $isOpen: boolean;
-  onClick: () => void;
-}
+import type { BurgerMenuProps } from "../../types/burger";
 
 const BurgerMenu: React.FC<BurgerMenuProps> = ({ $isOpen, onClick }) => {
   const navigate = useNavigate();

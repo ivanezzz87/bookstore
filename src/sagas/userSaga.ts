@@ -9,102 +9,17 @@ import {
   signupFailure,
   refreshTokenSuccess
 } from '../store/user/userSlice'
-import type { AuthCredentials, User, LoginResponse, SignupResponse } from '../types/user'
+import type { User, LoginResponse, SignupResponse } from '../types/user'
+import { getUserInfoApi, loginApi, refreshTokenApi, signupApi } from '../helpers/api'
+import type { RefreshTokenResponse, UserInfoResponse } from '../types/api'
 
-const API_BASE_URL = 'https://studapi.teachmeskills.by'
-
-// Типы для API ответов
-interface UserInfoResponse {
-  id: number
-  email: string
-  username: string
-}
-
-interface RefreshTokenResponse {
-  access: string
-}
-
-// API calls
-const loginApi = async (credentials: AuthCredentials): Promise<LoginResponse> => {
-  const response = await fetch(`${API_BASE_URL}/auth/jwt/create/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email: credentials.email,
-      password: credentials.password
-    })
-  })
-
-  if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.detail || 'Login failed')
-  }
-
-  return response.json()
-}
-
-const signupApi = async (credentials: AuthCredentials): Promise<SignupResponse> => {
-  const response = await fetch(`${API_BASE_URL}/auth/users/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      username: credentials.username,
-      email: credentials.email,
-      password: credentials.password
-    })
-  })
-
-  if (!response.ok) {
-    const errorData = await response.json()
-    const errorMessage = Object.values(errorData).flat().join(', ') || 'Registration failed'
-    throw new Error(errorMessage)
-  }
-
-  return response.json()
-}
-
-const getUserInfoApi = async (accessToken: string): Promise<UserInfoResponse> => {
-  const response = await fetch(`${API_BASE_URL}/auth/users/me/`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    }
-  })
-
-  if (!response.ok) {
-    throw new Error('Failed to get user info')
-  }
-
-  return response.json()
-}
-
-const refreshTokenApi = async (refreshToken: string): Promise<RefreshTokenResponse> => {
-  const response = await fetch(`${API_BASE_URL}/auth/jwt/refresh/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ refresh: refreshToken })
-  })
-
-  if (!response.ok) {
-    throw new Error('Token refresh failed')
-  }
-
-  return response.json()
-}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function* loginSaga(action: ReturnType<typeof loginStart>): Generator<any, void, any> {
   try {
     const tokens: LoginResponse = yield call(loginApi, action.payload)
     
-    // Получаем информацию о пользователе с правильной типизацией
+    // Получаем информацию о пользователе
     const userInfo: UserInfoResponse = yield call(getUserInfoApi, tokens.access)
     
     const user: User = {
